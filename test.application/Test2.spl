@@ -39,7 +39,7 @@ composite Test2
 			logic
 				onTuple filter0:
 					submit ({ga_client_id = filter0.data [ 0 ].ga_client_id, time = filter0.data [ 0 ].time,
-					 destination = filter0.data [ 0 ].routes [ 0 ].destination + "-" + filter0.data [ 0 ].routes [ 0 ].origin}, Custom_6_out0) ;
+					 destination = filter0.data [ 0 ].routes [ 0 ].origin + "-" + filter0.data [ 0 ].routes [ 0 ].destination}, Custom_6_out0) ;
 		}
 		
 		(stream<rstring device_ga_client_id, int64 time, rstring destination> Custom_7_out0) as device = Custom(filter1)
@@ -47,7 +47,7 @@ composite Test2
 			logic
 				onTuple filter1: if (filter1.data [ 0 ].device_ga_client_id != "")
 					submit ({device_ga_client_id = filter1.data [ 0 ].device_ga_client_id, time = filter1.data [ 0 ].time,
-					destination = filter1.data [ 0 ].routes [ 0 ].destination + "-" + filter1.data [ 0 ].routes [ 0 ].origin}, Custom_7_out0) ;
+					destination = filter1.data [ 0 ].routes [ 0 ].origin + "-" + filter1.data [ 0 ].routes [ 0 ].destination}, Custom_7_out0) ;
 		}
 		
 

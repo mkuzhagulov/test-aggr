@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<toolkitModel xmlns="http://www.ibm.com/xmlns/prod/streams/spl/toolkit" productVersion="4.2.0.3" xmlns:common="http://www.ibm.com/xmlns/prod/streams/spl/common" xmlns:ti="http://www.ibm.com/xmlns/prod/streams/spl/toolkitInfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <toolkit name="Test2" requiredProductVersion="4.2.0.3" version="1.0.0">
+    <description/>
+    <uriTable>
+      <uri index="1" value="test.application/Test2.spl"/>
+    </uriTable>
+    <namespace name="test.application">
+      <compositeOp column="11" line="13" name="Test2" potentialMain="true" uriIndex="1"/>
+      <type column="6" line="5" name="AeroType" static="true" type="list&lt;tuple&lt;int32 adult, boolean award, int32 children, rstring country, rstring currency, rstring email, rstring ga_client_id, rstring device_ga_client_id, rstring guid, int32 infant, rstring language, rstring loyalty_id, rstring phone, list&lt;tuple&lt;rstring booking_class, rstring cabin, rstring departure, rstring destination, rstring origin>> routes, rstring session_id, rstring step, int64 time, int32 youth>>" uriIndex="1"/>
+    </namespace>
+    <dependency>
+      <common:name>com.ibm.streams.cep</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.cybersecurity</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.dataexplorer</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.db</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.geospatial</common:name>
+      <common:version>3.0.2</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.rproject</common:name>
+      <common:version>2.0.1</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.rules</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.rulescompiler</common:name>
+      <common:version>1.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.teda</common:name>
+      <common:version>2.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.text</common:name>
+      <common:version>2.2.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streams.timeseries</common:name>
+      <common:version>4.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.datetime</common:name>
+      <common:version>1.1.2</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.dps</common:name>
+      <common:version>3.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.hbase</common:name>
+      <common:version>2.1.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.hdfs</common:name>
+      <common:version>3.0.100</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.inet</common:name>
+      <common:version>2.7.4</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.iot</common:name>
+      <common:version>1.0.2</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.jdbc</common:name>
+      <common:version>1.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.json</common:name>
+      <common:version>1.2.1</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.messaging</common:name>
+      <common:version>5.1.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.network</common:name>
+      <common:version>2.8.5</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.sparkmllib</common:name>
+      <common:version>1.0.0</common:version>
+    </dependency>
+    <dependency>
+      <common:name>com.ibm.streamsx.topology</common:name>
+      <common:version>1.4.4</common:version>
+    </dependency>
+    <sabFiles>
+      <ti:include path="toolkit.xml" root="toolkitDir"/>
+      <ti:include path="impl/java/lib/**" root="toolkitDir"/>
+      <ti:include path="impl/java/bin/**" root="toolkitDir"/>
+      <ti:include path="impl/bin/**" root="toolkitDir"/>
+      <ti:include path="impl/lib/**" root="toolkitDir"/>
+      <ti:include path="impl/nl/*.dat" root="toolkitDir"/>
+      <ti:include path="etc/**" root="toolkitDir"/>
+      <ti:include path="lib/**" root="toolkitDir"/>
+      <ti:include path="nl/**" root="toolkitDir"/>
+      <ti:include path="opt/**" root="toolkitDir"/>
+    </sabFiles>
+  </toolkit>
+
+</toolkitModel>
