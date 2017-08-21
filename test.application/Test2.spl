@@ -1,0 +1,69 @@
+namespace test.application ;
+
+use com.ibm.streamsx.json::JSONToTuple ;
+use com.ibm.streamsx.jdbc::JDBCRun ;
+type AeroType = list<tuple<int32 adult, boolean award, int32 children,
+	rstring country, rstring currency, rstring email, rstring ga_client_id,
+	rstring device_ga_client_id, rstring guid, int32 infant, rstring language,
+	rstring loyalty_id, rstring phone, list<tuple<rstring booking_class,
+	rstring cabin, rstring departure, rstring destination,
+	rstring origin>> routes, rstring session_id, rstring step, int64 time,
+	int32 youth>> ;
+
+composite Test2
+{
+	graph
+		(stream<rstring Json> StreamFromFile) as FileSource_1 = FileSource()
+		{
+			param
+				file : "/home/streamsadmin/data/rawdataexfull.txt" ;
+				format : line ;
+		}
+
+		(stream<AeroType data> JSONToTuple_5_out0) as JSONToTuple_5 =
+			JSONToTuple(StreamFromFile)
+		{
+			param
+				ignoreParsingError : true ;
+		}
+
+		(stream<AeroType data> filter0 ; stream<AeroType data> filter1) as Split_2 =
+			Split(JSONToTuple_5_out0 as inPort0Alias)
+		{
+			param
+				index : JSONToTuple_5_out0.data [ 0 ].ga_client_id != "" ? 0l : 1l ;
+		}
+		
+		(stream<rstring ga_client_id, int64 time, rstring destination> Custom_6_out0) as client = Custom(filter0)
+		{
+			logic
+				onTuple filter0:
+					submit ({ga_client_id = filter0.data [ 0 ].ga_client_id, time = filter0.data [ 0 ].time,
+					 destination = filter0.data [ 0 ].routes [ 0 ].origin + "-" + filter0.data [ 0 ].routes [ 0 ].destination}, Custom_6_out0) ;
+		}
+		
+		(stream<rstring device_ga_client_id, int64 time, rstring destination> Custom_7_out0) as device = Custom(filter1)
+		{
+			logic
+				onTuple filter1: if (filter1.data [ 0 ].device_ga_client_id != "")
+					submit ({device_ga_client_id = filter1.data [ 0 ].device_ga_client_id, time = filter1.data [ 0 ].time,
+					destination = filter1.data [ 0 ].routes [ 0 ].origin + "-" + filter1.data [ 0 ].routes [ 0 ].destination}, Custom_7_out0) ;
+		}
+		
+
+		() as FileSink_3 = FileSink(Custom_6_out0 as inputStream)
+		{
+			param
+				file : "client_id" ;
+				format : csv ;
+		}
+
+		() as FileSink_4 = FileSink(Custom_7_out0 as inputStream)
+		{
+			param
+				file : "device_id" ;
+				format : csv ;
+		}
+
+
+}
