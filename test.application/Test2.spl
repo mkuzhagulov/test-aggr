@@ -33,37 +33,76 @@ composite Test2
 			param
 				index : JSONToTuple_5_out0.data [ 0 ].ga_client_id != "" ? 0l : 1l ;
 		}
-		
-		(stream<rstring ga_client_id, int64 time, rstring destination> Custom_6_out0) as client = Custom(filter0)
+
+		(stream<rstring ga_client_id, int64 time, rstring destination, rstring step>
+			clientOut) as client = Custom(filter0)
 		{
 			logic
-				onTuple filter0:
-					submit ({ga_client_id = filter0.data [ 0 ].ga_client_id, time = filter0.data [ 0 ].time,
-					 destination = filter0.data [ 0 ].routes [ 0 ].origin + "-" + filter0.data [ 0 ].routes [ 0 ].destination}, Custom_6_out0) ;
+				onTuple filter0 : submit({ ga_client_id = filter0.data [ 0 ].ga_client_id,
+					time = filter0.data [ 0 ].time, destination = filter0.data [ 0 ].routes [
+					0 ].origin + "-" + filter0.data [ 0 ].routes [ 0 ].destination, step =
+					filter0.data [ 0 ].step }, clientOut) ;
 		}
-		
-		(stream<rstring device_ga_client_id, int64 time, rstring destination> Custom_7_out0) as device = Custom(filter1)
+
+		(stream<rstring device_ga_client_id, int64 time, rstring destination,
+			rstring step> deviceOut) as device = Custom(filter1)
 		{
 			logic
-				onTuple filter1: if (filter1.data [ 0 ].device_ga_client_id != "")
-					submit ({device_ga_client_id = filter1.data [ 0 ].device_ga_client_id, time = filter1.data [ 0 ].time,
-					destination = filter1.data [ 0 ].routes [ 0 ].origin + "-" + filter1.data [ 0 ].routes [ 0 ].destination}, Custom_7_out0) ;
+				onTuple filter1 : if(filter1.data [ 0 ].device_ga_client_id != "") submit({
+					device_ga_client_id = filter1.data [ 0 ].device_ga_client_id, time =
+					filter1.data [ 0 ].time, destination = filter1.data [ 0 ].routes [ 0
+					].origin + "-" + filter1.data [ 0 ].routes [ 0 ].destination, step =
+					filter1.data [ 0 ].step }, deviceOut) ;
+		}
+		
+		(stream<rstring ga_client_id, int64 time, rstring destination, rstring step> agg_client_data) as Agg_client = Custom(clientOut)
+		{
+			logic
+				state :
+				{
+					mutable map<rstring, list<list<rstring>>> dict = {} ;
+				}
+				
+				
+				onTuple clientOut :
+				{
+					mutable int32 counter = 0;
+					while(counter < 34007)
+					{
+						if(has(dict, clientOut.ga_client_id) == false)
+						{
+							mutable list<list<rstring>>> tmpList = [[], []];
+							appendM(tmpList[0], clientOut.step);
+							appendM(tmpList[1], clientOut.destination);
+							insertM(dict, clientOut.ga_client_id, tmp);
+						}
+						else
+						{
+							appendM(dict[clientOut.ga_client_id][0], clientOut.step);
+							appendM(dict[clientOut.ga_client_id][1], clientOut.destination);	
+						}
+						counter = counter + 1 ;
+					}
+					submit({ga_client_id = clientOut.ga_client_id, time = clientOut.time, destination = clientOut.destination,
+					step = dict[clientOut.ga_client_id]}, agg_client_data);
+				} 
+					
 		}
 		
 
-		() as FileSink_3 = FileSink(Custom_6_out0 as inputStream)
-		{
-			param
-				file : "client_id" ;
-				format : csv ;
-		}
+		() as FileSink_3 = FileSink(agg_client_data as inputStream)
+			{
+				param
+					file : "paupau" ;
+					format : csv ;
+			}
 
-		() as FileSink_4 = FileSink(Custom_7_out0 as inputStream)
-		{
-			param
-				file : "device_id" ;
-				format : csv ;
-		}
+		() as FileSink_4 = FileSink(deviceOut as inputStream)
+			{
+				param
+					file : "device_id1" ;
+					format : csv ;
+			}
 
-
-}
+		
+	}

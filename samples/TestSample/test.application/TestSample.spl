@@ -1,41 +1,4 @@
 namespace test.application ;
 
-use com.ibm.streamsx.json::JSONToTuple ;
 
-composite TestSample
-{
-	graph
-		stream<rstring stringJson> inJson = Import()
-		{
-			param
-				applicationName : "application::HTTPInjectToJson" ;
-				streamId : "prodData" ;
-		}
-
-		stream<list<DataSource> data> ParsedJSONs = JSONToTuple(inJson)
-		{
-			param
-				ignoreParsingError : true ;
-		}
-
-		stream<DataSource> dataTupled = Functor(ParsedJSONs as parsedJson)
-		{
-			param
-				filter : size(parsedJson.data) >= 0 ;
-			output
-				dataTupled : award = parsedJson.data [ 0 ].award, step = parsedJson.data [
-					0 ].step, guid = parsedJson.data [ 0 ].guid, loyalty_id = parsedJson.data
-					[ 0 ].loyalty_id, ga_client_id = parsedJson.data [ 0 ].ga_client_id,
-					device_ga_client_id = parsedJson.data [ 0 ].device_ga_client_id,
-					device_token = parsedJson.data [ 0 ].device_token, time = parsedJson.data
-					[ 0 ].time, country = parsedJson.data [ 0 ].country, currency =
-					parsedJson.data [ 0 ].currency, language = parsedJson.data [ 0 ].language,
-					phone = parsedJson.data [ 0 ].phone, email = parsedJson.data [ 0 ].email,
-					adult = parsedJson.data [ 0 ].adult, children = parsedJson.data [ 0
-					].children, youth = parsedJson.data [ 0 ].youth, infant = parsedJson.data
-					[ 0 ].infant, pnr_locator = parsedJson.data [ 0 ].pnr_locator, routes =
-					parsedJson.data [ 0 ].routes ;
-		}
-
-}
 
