@@ -79,7 +79,7 @@ composite Test2
 						else
 						{
 							appendM(dict[clientOut.ga_client_id][0], clientOut.step);
-							appendM(dict[clientOut.ga_client_id][1], clientOut.destination);	
+							appendM(dict[clientOut.ga_client_id][1], clientOut.destination) ;	
 						}
 						counter = counter + 1 ;
 					}
