@@ -53,56 +53,207 @@ composite Test2
 					filter1.data [ 0 ].time, destination = filter1.data [ 0 ].routes [ 0
 					].origin + "-" + filter1.data [ 0 ].routes [ 0 ].destination, step =
 					filter1.data [ 0 ].step }, deviceOut) ;
-		}
-		
-		(stream<rstring ga_client_id, int64 time, rstring destination, rstring step> agg_client_data) as Agg_client = Custom(clientOut)
-		{
-			logic
-				state :
-				{
-					mutable map<rstring, list<list<rstring>>> dict = {} ;
-				}
-				
-				
-				onTuple clientOut :
-				{
-					mutable int32 counter = 0;
-					while(counter < 34007)
+			}
+
+		(stream<rstring ga_client_id, rstring step, rstring destination>
+			agg_client_data) as Agg_client = Custom(clientOut)
+			{
+				logic
+					state :
+					{
+						mutable map<rstring, list<list<rstring>>> dict = { } ;
+						mutable list<rstring> iter = [ ] ;
+						int32 MAX_SIZE = 26113 ;
+						mutable int32 counter = 0 ;
+					}
+
+					onTuple clientOut :
 					{
 						if(has(dict, clientOut.ga_client_id) == false)
 						{
-							mutable list<list<rstring>>> tmpList = [[], []];
-							appendM(tmpList[0], clientOut.step);
-							appendM(tmpList[1], clientOut.destination);
-							insertM(dict, clientOut.ga_client_id, tmp);
+						//записываю сиды для итерации отображения
+							appendM(iter, clientOut.ga_client_id) ;
+							//формирую отображение
+							mutable list<list<rstring>> tmpList = [ ] ;
+							list<rstring> emptyList = [ ] ;
+							appendM(tmpList, emptyList) ;
+							appendM(tmpList, emptyList) ;
+							appendM(tmpList [ 0 ], clientOut.step) ;
+							appendM(tmpList [ 1 ], clientOut.destination) ;
+							insertM(dict, clientOut.ga_client_id, tmpList) ;
 						}
+
 						else
 						{
-							appendM(dict[clientOut.ga_client_id][0], clientOut.step);
-							appendM(dict[clientOut.ga_client_id][1], clientOut.destination);	
+						//дописываю значение в отображение, если сид повторился
+							appendM(dict [ clientOut.ga_client_id ] [ 0 ], clientOut.step) ;
+							appendM(dict [ clientOut.ga_client_id ] [ 1 ], clientOut.destination) ;
 						}
+
+						if(counter == MAX_SIZE - 1)
+						{
+						//поиск моды
+							for(int32 i in range(size(iter)))
+							{
+								mutable int32 maxDest = 0 ;
+								for(int32 j in range(size(dict [ iter [ i ] ] [ 1 ])))
+								{
+									if(size(find(dict [ iter [ i ] ] [ 1 ], dict [ iter [ i ] ] [ 1 ] [ j
+										])) >= maxDest)
+									{
+										maxDest = j ;
+									}
+
+									if(j == size(dict [ iter [ i ] ] [ 1 ]) - 1)
+									{
+										dict [ iter [ i ] ] [ 1 ] [ 0 ] = dict [ iter [ i ] ] [ 1 ] [ maxDest
+											] ;
+									}
+
+								}
+
+							}
+							//поиск максимального степа у сида и вывод всего тапла
+							for(int32 i in range(size(iter)))
+							{
+								if(has(dict [ iter [ i ] ] [ 0 ], "book"))
+								{
+									submit({ ga_client_id = iter [ i ], step = "book", destination = dict
+										[ iter [ i ] ] [ 1 ] [ 0 ] }, agg_client_data) ;
+								}
+
+								else
+								{
+									if(has(dict [ iter [ i ] ] [ 0 ], "price")) 
+									{
+										submit({ ga_client_id = iter [ i ], step = "price", destination = dict [ iter [ i ] ] [ 1 ] [
+										0 ] }, agg_client_data) ;
+									}
+									else 
+									{
+										submit({ ga_client_id = iter [ i ], step = "search", destination
+										= dict [ iter [ i ] ] [ 1 ] [ 0 ] }, agg_client_data) ;
+									}
+								}
+
+							}
+
+						}
+
 						counter = counter + 1 ;
+						//for(rstring i in )
+						//submit({ga_client_id = clientOut.ga_client_id, time = clientOut.time, destination = clientOut.destination,
+						//step = dict[clientOut.ga_client_id]}, agg_client_data);
+
 					}
-					submit({ga_client_id = clientOut.ga_client_id, time = clientOut.time, destination = clientOut.destination,
-					step = dict[clientOut.ga_client_id]}, agg_client_data);
-				} 
+
+			}
+		
+		(stream<rstring device_ga_client_id, rstring step, rstring destination> agg_device_data) as Agg_device = Custom(deviceOut)
+				{
+					logic
+						state :
+						{
+							mutable map<rstring, list<list<rstring>>> dict = { } ;
+							mutable list<rstring> iter = [ ] ;
+							int32 MAX_SIZE = 4825 ;
+							mutable int32 counter = 0 ;
+						}
+					onTuple deviceOut :
+					{
+						if(has(dict, deviceOut.device_ga_client_id) == false)
+						{
+						//записываю сиды для итерации отображения
+							appendM(iter, deviceOut.device_ga_client_id) ;
+							//формирую отображение
+							mutable list<list<rstring>> tmpList = [ ] ;
+							list<rstring> emptyList = [ ] ;
+							appendM(tmpList, emptyList) ;
+							appendM(tmpList, emptyList) ;
+							appendM(tmpList [ 0 ], deviceOut.step) ;
+							appendM(tmpList [ 1 ], deviceOut.destination) ;
+							insertM(dict, deviceOut.device_ga_client_id, tmpList) ;
+						}
+
+						else
+						{
+						//дописываю значение в отображение, если сид повторился
+							appendM(dict [ deviceOut.device_ga_client_id ] [ 0 ], deviceOut.step) ;
+							appendM(dict [ deviceOut.device_ga_client_id ] [ 1 ], deviceOut.destination) ;
+						}
+
+						if(counter == MAX_SIZE - 1)
+						{
+						//поиск моды
+							for(int32 i in range(size(iter)))
+							{
+								mutable int32 maxDest = 0 ;
+								for(int32 j in range(size(dict [ iter [ i ] ] [ 1 ])))
+								{
+									if(size(find(dict [ iter [ i ] ] [ 1 ], dict [ iter [ i ] ] [ 1 ] [ j
+										])) >= maxDest)
+									{
+										maxDest = j ;
+									}
+
+									if(j == size(dict [ iter [ i ] ] [ 1 ]) - 1)
+									{
+										dict [ iter [ i ] ] [ 1 ] [ 0 ] = dict [ iter [ i ] ] [ 1 ] [ maxDest
+											] ;
+									}
+
+								}
+
+							}
+							//поиск максимального степа у сида и вывод всего тапла
+							for(int32 i in range(size(iter)))
+							{
+								if(has(dict [ iter [ i ] ] [ 0 ], "book"))
+								{
+									submit({ device_ga_client_id = iter [ i ], step = "book", destination = dict
+										[ iter [ i ] ] [ 1 ] [ 0 ] }, agg_device_data) ;
+								}
+
+								else
+								{
+									if(has(dict [ iter [ i ] ] [ 0 ], "price"))
+									{
+										submit({ device_ga_client_id = iter [ i ], step = "price", destination = dict [ iter [ i ] ] [ 1 ] [
+										0 ] }, agg_device_data) ;
+									}
+									else
+									{
+										submit({ device_ga_client_id = iter [ i ], step = "search", destination
+										= dict [ iter [ i ] ] [ 1 ] [ 0 ] }, agg_device_data) ;
+									}
+								}
+
+							}
+
+						}
+
+						counter = counter + 1 ;
+						//for(rstring i in )
+						//submit({ga_client_id = clientOut.ga_client_id, time = clientOut.time, destination = clientOut.destination,
+						//step = dict[clientOut.ga_client_id]}, agg_client_data);
+
+					}
 					
+				}
+
+			() as FileSink_3 = FileSink(agg_client_data as inputStream)
+				{
+					param
+						file : "aggregaciya_client" ;
+						format : csv ;
+				}
+
+			() as FileSink_4 = FileSink(agg_device_data as inputStream)
+				{
+					param
+						file : "aggregaciya_device" ;
+						format : csv ;
+				}
+
+
 		}
-		
-
-		() as FileSink_3 = FileSink(agg_client_data as inputStream)
-			{
-				param
-					file : "paupau" ;
-					format : csv ;
-			}
-
-		() as FileSink_4 = FileSink(deviceOut as inputStream)
-			{
-				param
-					file : "device_id1" ;
-					format : csv ;
-			}
-
-		
-	}
