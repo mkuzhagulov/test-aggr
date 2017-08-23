@@ -156,7 +156,7 @@ composite Test2
 						{
 							mutable map<rstring, list<list<rstring>>> dict = { } ;
 							mutable list<rstring> iter = [ ] ;
-							int32 MAX_SIZE = 4825 ;
+							int32 MAX_SIZE = 4825;
 							mutable int32 counter = 0 ;
 						}
 					onTuple deviceOut :
